@@ -1,15 +1,38 @@
-const express = require("express"); //Import the express dependency
-const app = express(); //Instantiate an express app, the main work horse of this server
-const port = 5050; //Save the port number where your server will be listening
+const express = require("express");
+const app = express();
+const port = 5050;
+const axios = require("axios");
 
-//Idiomatic expression in express to route and respond to a client request
-app.get("/", (req, res) => {
-  //get requests to the root ("/") will route here
-  res.sendFile("index1.html", { root: __dirname }); //server responds by sending the index.html file to the client's browser
-  //the .sendFile method needs the absolute path to the file, see: https://expressjs.com/en/4x/api.html#res.sendFile
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+app.post("/node", function (req, res) {
+  get_url =
+    "https://shopify-appdev.swymrelay.com/charges.php?siteurl=" +
+    req.body["m-url"] +
+    "&appname=" +
+    req.body["app-name"] +
+    "&plan=" +
+    req.body["plan"] +
+    "&trial=" +
+    req.body["trial"] +
+    "&price=" +
+    req.body["price"] +
+    "&isannual=" +
+    req.body["annual"];
+
+  var link;
+  axios.get(get_url).then((response) => {
+    link = response.data;
+    console.log(link);
+    res.format({
+      "text/html": function () {
+        res.send(link);
+      },
+    });
+  });
 });
 
 app.listen(port, () => {
-  //server starts listening for any attempts from a client to connect at port: {port}
   console.log(`Now listening on port ${port}`);
 });
